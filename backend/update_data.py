@@ -1,14 +1,14 @@
+import os
 import requests
 import json
-import os
 from github import Github
 
-# GitHub token for authentication
+# Retrieve GitHub token
 GITHUB_TOKEN = os.getenv("PAT_TOKEN")
 if not GITHUB_TOKEN:
     raise ValueError("GitHub token not found. Ensure PAT_TOKEN is set in GitHub secrets.")
 
-# API Key for Ordnance Survey
+# Retrieve Ordnance Survey API key
 API_KEY = os.getenv("ORDNANCE_SURVEY_API_KEY")
 if not API_KEY:
     raise ValueError("Ordnance Survey API key not found. Ensure ORDNANCE_SURVEY_API_KEY is set in GitHub secrets.")

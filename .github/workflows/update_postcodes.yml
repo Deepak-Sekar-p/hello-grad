@@ -45,4 +45,3 @@ jobs:
             git push origin main
           else
             echo "No data file found, skipping commit step."
-          fi
