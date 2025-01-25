@@ -1,15 +1,5 @@
-// Define the API URL to fetch postcode data from the GitHub raw content URL
 const apiUrl = 'https://raw.githubusercontent.com/Deepak-Sekar-p/hello-grad/main/data/uk_postcodes.json';
 
-// Initialize the map centered around the UK
-const map = L.map('map').setView([51.509865, -0.118092], 6);
-
-// Load and display OpenStreetMap tiles on the map
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-// Function to fetch and load postcode data from GitHub
 fetch(apiUrl)
     .then(response => {
         if (!response.ok) {
