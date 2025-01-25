@@ -12,21 +12,40 @@ if not GITHUB_TOKEN:
 REPO_NAME = "Deepak-Sekar-p/hello-grad"
 DATA_FILE_PATH = "data/uk_postcodes.json"
 
-def fetch_postcode_data():
+# List of all UK postcode areas
+POSTCODE_AREAS = [
+    "AB", "AL", "B", "BA", "BB", "BD", "BH", "BL", "BN", "BR", "BS", "BT", "CA", "CB",
+    "CF", "CH", "CM", "CO", "CR", "CT", "CV", "CW", "DA", "DD", "DE", "DG", "DH", "DL",
+    "DN", "DT", "DY", "E", "EC", "EH", "EN", "EX", "FK", "FY", "G", "GL", "GU", "GY",
+    "HA", "HD", "HG", "HP", "HR", "HS", "HU", "HX", "IG", "IM", "IP", "IV", "KA", "KT",
+    "KW", "KY", "L", "LA", "LD", "LE", "LL", "LN", "LS", "LU", "M", "ME", "MK", "ML",
+    "N", "NE", "NG", "NN", "NP", "NR", "NW", "OL", "OX", "PA", "PE", "PH", "PL", "PO",
+    "PR", "RG", "RH", "RM", "S", "SA", "SE", "SG", "SK", "SL", "SM", "SN", "SO", "SP",
+    "SR", "SS", "ST", "SW", "SY", "TA", "TD", "TF", "TN", "TQ", "TR", "TS", "TW", "UB",
+    "W", "WA", "WC", "WD", "WF", "WN", "WR", "WS", "WV", "YO", "ZE"
+]
+
+def fetch_all_postcodes():
     """
-    Fetch postcode data from Postcodes.io API (no API key required).
+    Fetch postcode data area by area using Postcodes.io API.
     """
-    url = "https://api.postcodes.io/postcodes?EC1A1BB"
-    print(f"Fetching postcode data from: {url}")
+    all_postcodes = []
 
-    response = requests.get(url, timeout=60)
+    for area in POSTCODE_AREAS:
+        url = f"https://api.postcodes.io/postcodes?q={area}"
+        print(f"Fetching postcode data for area: {area}")
+        response = requests.get(url, timeout=60)
 
-    if response.status_code == 404:
-        raise Exception("Error 404: API endpoint not found.")
-    elif response.status_code != 200:
-        raise Exception(f"Failed to fetch postcode data: {response.status_code} {response.text}")
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("status") == 200 and data.get("result"):
+                all_postcodes.extend(data["result"])
+            else:
+                print(f"No results found for area {area}")
+        else:
+            print(f"Failed to fetch postcode data for {area}: {response.status_code} {response.text}")
 
-    return response.json()
+    return all_postcodes
 
 def update_github_file(data):
     """
@@ -59,7 +78,7 @@ def update_github_file(data):
 
 if __name__ == "__main__":
     try:
-        postcode_data = fetch_postcode_data()
+        postcode_data = fetch_all_postcodes()
         update_github_file(postcode_data)
     except Exception as e:
         print(f"Error encountered: {e}")

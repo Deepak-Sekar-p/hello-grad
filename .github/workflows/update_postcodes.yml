@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Disable default credentials to use PAT
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -34,15 +34,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Deepak-Sekar-p/hello-grad.git
-
-          # Ensure the data directory exists
-          mkdir -p data
-
-          # Pull the latest changes to avoid conflicts
           git pull origin main --rebase
 
-          # Check if data file exists before committing
           if [ -f "data/uk_postcodes.json" ]; then
             git add data/uk_postcodes.json
             git commit -m "Auto-update postcode data" || echo "No changes to commit"
