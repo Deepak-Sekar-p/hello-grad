@@ -1,5 +1,7 @@
 import os
 import requests
+import zipfile
+import io
 import json
 from github import Github
 
@@ -12,40 +14,43 @@ if not GITHUB_TOKEN:
 REPO_NAME = "Deepak-Sekar-p/hello-grad"
 DATA_FILE_PATH = "data/uk_postcodes.json"
 
-# List of all UK postcode areas
-POSTCODE_AREAS = [
-    "AB", "AL", "B", "BA", "BB", "BD", "BH", "BL", "BN", "BR", "BS", "BT", "CA", "CB",
-    "CF", "CH", "CM", "CO", "CR", "CT", "CV", "CW", "DA", "DD", "DE", "DG", "DH", "DL",
-    "DN", "DT", "DY", "E", "EC", "EH", "EN", "EX", "FK", "FY", "G", "GL", "GU", "GY",
-    "HA", "HD", "HG", "HP", "HR", "HS", "HU", "HX", "IG", "IM", "IP", "IV", "KA", "KT",
-    "KW", "KY", "L", "LA", "LD", "LE", "LL", "LN", "LS", "LU", "M", "ME", "MK", "ML",
-    "N", "NE", "NG", "NN", "NP", "NR", "NW", "OL", "OX", "PA", "PE", "PH", "PL", "PO",
-    "PR", "RG", "RH", "RM", "S", "SA", "SE", "SG", "SK", "SL", "SM", "SN", "SO", "SP",
-    "SR", "SS", "ST", "SW", "SY", "TA", "TD", "TF", "TN", "TQ", "TR", "TS", "TW", "UB",
-    "W", "WA", "WC", "WD", "WF", "WN", "WR", "WS", "WV", "YO", "ZE"
-]
+# ONS Postcode Directory ZIP file URL (replace with the updated URL from the portal)
+ONS_ZIP_URL = "https://www.arcgis.com/sharing/rest/content/items/2cc9b1e28d0a4c748391526ddf426b16/data"
 
-def fetch_all_postcodes():
+def download_and_extract_zip(url):
     """
-    Fetch postcode data area by area using Postcodes.io API.
+    Download and extract the ZIP file containing the ONS Postcode Directory.
     """
-    all_postcodes = []
+    response = requests.get(url)
+    if response.status_code == 200:
+        with zipfile.ZipFile(io.BytesIO(response.content)) as z:
+            for filename in z.namelist():
+                if filename.endswith(".csv"):
+                    print(f"Extracting: {filename}")
+                    with z.open(filename) as f:
+                        return f.read().decode("utf-8")
+    else:
+        raise Exception(f"Failed to download file: {response.status_code} {response.text}")
 
-    for area in POSTCODE_AREAS:
-        url = f"https://api.postcodes.io/postcodes?q={area}"
-        print(f"Fetching postcode data for area: {area}")
-        response = requests.get(url, timeout=60)
-
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("status") == 200 and data.get("result"):
-                all_postcodes.extend(data["result"])
-            else:
-                print(f"No results found for area {area}")
-        else:
-            print(f"Failed to fetch postcode data for {area}: {response.status_code} {response.text}")
-
-    return all_postcodes
+def process_postcode_csv(csv_content):
+    """
+    Process the ONS CSV data to extract relevant postcode information.
+    """
+    lines = csv_content.splitlines()
+    headers = lines[0].split(",")
+    postcode_index = headers.index("pcds")  # Postcode column
+    lat_index = headers.index("lat")       # Latitude column
+    long_index = headers.index("long")     # Longitude column
+    
+    postcodes = []
+    for line in lines[1:]:  # Skip the header
+        columns = line.split(",")
+        postcodes.append({
+            "postcode": columns[postcode_index],
+            "latitude": float(columns[lat_index]),
+            "longitude": float(columns[long_index]),
+        })
+    return postcodes
 
 def update_github_file(data):
     """
@@ -78,7 +83,11 @@ def update_github_file(data):
 
 if __name__ == "__main__":
     try:
-        postcode_data = fetch_all_postcodes()
+        print("Downloading ONS Postcode Directory...")
+        csv_data = download_and_extract_zip(ONS_ZIP_URL)
+        print("Processing postcode data...")
+        postcode_data = process_postcode_csv(csv_data)
+        print("Updating GitHub repository...")
         update_github_file(postcode_data)
     except Exception as e:
         print(f"Error encountered: {e}")
