@@ -16,7 +16,7 @@ def fetch_postcode_data():
     """
     Fetch postcode data from Postcodes.io API (no API key required).
     """
-    url = "https://api.postcodes.io/postcodes?q=London"
+    url = "https://api.postcodes.io/postcodes?EC1A1BB"
     print(f"Fetching postcode data from: {url}")
 
     response = requests.get(url, timeout=60)
