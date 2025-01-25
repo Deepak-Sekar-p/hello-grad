@@ -1,28 +1,32 @@
-// Initialize the map with a center point (UK coordinates)
+// Define the API URL to fetch postcode data from the GitHub raw content URL
+const apiUrl = 'https://raw.githubusercontent.com/Deepak-Sekar-p/hello-grad/main/data/uk_postcodes.json';
+
+// Initialize the map centered around the UK
 const map = L.map('map').setView([51.509865, -0.118092], 6);
 
-// Add OpenStreetMap tile layer
+// Load and display OpenStreetMap tiles on the map
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Replace with your deployed backend API URL
-const apiUrl = 'https://deepak-sekar-p.github.io/hello-grad/api/postcodes';
-
-// Function to fetch postcode data from the backend API
+// Function to fetch and load postcode data from GitHub
 fetch(apiUrl)
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();  // Parse JSON response
+    })
     .then(data => {
-        document.getElementById('status-message').innerText = 'Postcode data loaded successfully!';
-        
-        if (data.data && data.data.length > 0) {
-            data.data.forEach(postcode => {
+        if (data && data.length > 0) {
+            data.forEach(postcode => {
                 if (postcode.latitude && postcode.longitude) {
                     L.marker([postcode.latitude, postcode.longitude])
                         .addTo(map)
                         .bindPopup(`<b>${postcode.postcode}</b><br>${postcode.admin_district}`);
                 }
             });
+            document.getElementById('status-message').innerText = 'Postcode data loaded successfully!';
         } else {
             document.getElementById('status-message').innerText = 'No postcode data available.';
         }
