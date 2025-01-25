@@ -13,6 +13,9 @@ API_KEY = os.getenv("ORDNANCE_SURVEY_API_KEY")
 if not API_KEY:
     raise ValueError("Ordnance Survey API key not found. Ensure ORDNANCE_SURVEY_API_KEY is set in GitHub secrets.")
 
+# Debugging: Print part of API key to verify it's loaded correctly (for security reasons)
+print(f"Using API key: {API_KEY[:5]}... (hidden for security)")
+
 # GitHub repository details
 REPO_NAME = "Deepak-Sekar-p/hello-grad"
 DATA_FILE_PATH = "data/uk_postcodes.json"
@@ -43,6 +46,9 @@ def update_github_file(data):
     repo = g.get_repo(REPO_NAME)
 
     os.makedirs(os.path.dirname(DATA_FILE_PATH), exist_ok=True)
+
+    with open(DATA_FILE_PATH, 'w') as f:
+        json.dump(data, f, indent=4)
 
     try:
         contents = repo.get_contents(DATA_FILE_PATH)

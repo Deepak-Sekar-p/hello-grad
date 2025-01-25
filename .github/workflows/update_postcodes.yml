@@ -23,8 +23,10 @@ jobs:
       - name: Install dependencies
         run: pip install requests PyGithub
 
-      - name: Test Internet Connection
-        run: curl -I https://api.os.uk
+      - name: Debug API Key
+        env:
+          ORDNANCE_SURVEY_API_KEY: ${{ secrets.ORDNANCE_SURVEY_API_KEY }}
+        run: echo "API Key starts with ${ORDNANCE_SURVEY_API_KEY:0:5}"
 
       - name: Run postcode update script
         env:
