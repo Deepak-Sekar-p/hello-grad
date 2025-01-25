@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Disable default credentials
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -27,9 +29,12 @@ jobs:
         run: python backend/update_data.py
 
       - name: Commit and push changes
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/yourusername/hello-grad-webapp.git
           git add data/uk_postcodes.json
-          git commit -m "Auto-update postcode data"
-          git push
+          git commit -m "Auto-update postcode data" || echo "No changes to commit"
+          git push origin main

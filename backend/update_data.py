@@ -3,12 +3,11 @@ import json
 import os
 from github import Github
 
-# Constants
-GITHUB_TOKEN = os.getenv("PAT_TOKEN")  # GitHub token for authentication
+# Use the correct environment variable name for GitHub authentication
+GITHUB_TOKEN = os.getenv("GITHUB_ACCESS_TOKEN")
 REPO_NAME = "Deepak-Sekar-p/hello-grad"
-DATA_FILE_PATH = "uk_postcodes.json"
+DATA_FILE_PATH = "data/uk_postcodes.json"
 
-# Function to fetch postcode data from an open API (e.g., Ordnance Survey, OpenData)
 def fetch_postcode_data():
     url = "https://api.ordnancesurvey.co.uk/opendata/downloads/products/PostcodeBoundaries/latest"
     response = requests.get(url)
@@ -17,12 +16,10 @@ def fetch_postcode_data():
     else:
         raise Exception("Failed to fetch postcode data")
 
-# Function to update the data file on GitHub
 def update_github_file(data):
     g = Github(GITHUB_TOKEN)
     repo = g.get_repo(REPO_NAME)
 
-    # Get the existing content
     try:
         contents = repo.get_contents(DATA_FILE_PATH)
         repo.update_file(
@@ -32,7 +29,6 @@ def update_github_file(data):
             contents.sha
         )
     except Exception:
-        # If the file does not exist, create it
         repo.create_file(
             DATA_FILE_PATH,
             "Create postcode data file",
@@ -41,8 +37,5 @@ def update_github_file(data):
     print("Postcode data updated successfully.")
 
 if __name__ == "__main__":
-    try:
-        postcode_data = fetch_postcode_data()
-        update_github_file(postcode_data)
-    except Exception as e:
-        print(f"Error: {e}")
+    postcode_data = fetch_postcode_data()
+    update_github_file(postcode_data)
