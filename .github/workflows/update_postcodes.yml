@@ -38,7 +38,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/yourusername/hello-grad-webapp.git
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Deepak-Sekar-p/hello-grad-webapp.git
           git pull origin main  # Ensure the latest changes are fetched
           git add data/uk_postcodes.json
           git commit -m "Auto-update postcode data" || echo "No changes to commit"
