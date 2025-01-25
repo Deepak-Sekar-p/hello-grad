@@ -7,7 +7,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Replace with your deployed backend API URL
-const apiUrl = 'https://your-backend-api-url/api/postcodes';
+const apiUrl = 'https://localhost:8000/api/postcodes';
 
 // Function to fetch postcode data from the backend API
 fetch(apiUrl)
