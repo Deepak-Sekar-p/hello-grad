@@ -4,7 +4,7 @@ import os
 from github import Github
 
 # Constants
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # GitHub token for authentication
+GITHUB_TOKEN = os.getenv("PAT_TOKEN")  # GitHub token for authentication
 REPO_NAME = "Deepak-Sekar-p/hello-grad"
 DATA_FILE_PATH = "uk_postcodes.json"
 

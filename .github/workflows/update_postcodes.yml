@@ -3,7 +3,7 @@ name: Update UK Postcodes
 on:
   schedule:
     - cron: "0 0 * * 0"  # Runs every Sunday at midnight UTC
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   update-data:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run postcode update script
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: python backend/update_data.py
 
       - name: Commit and push changes
