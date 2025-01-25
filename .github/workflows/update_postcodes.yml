@@ -3,7 +3,7 @@ name: Update UK Postcodes
 on:
   schedule:
     - cron: "0 0 * * 0"  # Runs every Sunday at midnight UTC
-  workflow_dispatch:  # Allows manual triggering
+  workflow_dispatch:  # Allows manual triggering from GitHub Actions UI
 
 jobs:
   update-data:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Disable default credentials
+          persist-credentials: false  # Disable default credentials to use PAT
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -39,9 +39,15 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Deepak-Sekar-p/hello-grad.git
+
+          # Ensure the data directory exists
+          mkdir -p data
+
+          # Check if data file exists before committing
           if [ -f "data/uk_postcodes.json" ]; then
             git add data/uk_postcodes.json
             git commit -m "Auto-update postcode data" || echo "No changes to commit"
             git push origin main
           else
             echo "No data file found, skipping commit step."
+          fi
