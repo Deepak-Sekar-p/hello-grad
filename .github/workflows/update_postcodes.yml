@@ -23,15 +23,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests PyGithub
 
-      - name: Debug API Key
-        env:
-          ORDNANCE_SURVEY_API_KEY: ${{ secrets.ORDNANCE_SURVEY_API_KEY }}
-        run: echo "API Key starts with ${ORDNANCE_SURVEY_API_KEY:0:5}"
-
       - name: Run postcode update script
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-          ORDNANCE_SURVEY_API_KEY: ${{ secrets.ORDNANCE_SURVEY_API_KEY }}
         run: python backend/update_data.py
 
       - name: Commit and push changes
