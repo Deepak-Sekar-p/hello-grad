@@ -1,26 +1,33 @@
-var map = L.map('map').setView([54.5, -2], 6);
+// Initialize the map with a center point (UK coordinates)
+const map = L.map('map').setView([51.509865, -0.118092], 6);
 
+// Add OpenStreetMap tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-fetch('https://your-backend-url/api/postcodes')
+// Replace with your deployed backend API URL
+const apiUrl = 'https://your-backend-api-url/api/postcodes';
+
+// Function to fetch postcode data from the backend API
+fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
-        data.data.forEach(area => {
-            let geoJson = L.geoJSON(area.boundary, {
-                style: { color: "#3388ff", weight: 2 },
-                onEachFeature: function (feature, layer) {
-                    layer.on('mouseover', function () {
-                        layer.setStyle({ color: "yellow" });
-                        layer.bindPopup(`<b>Postcode:</b> ${area.postcode}<br>Lat: ${area.latitude}, Lon: ${area.longitude}`).openPopup();
-                    });
-                    layer.on('mouseout', function () {
-                        layer.setStyle({ color: "#3388ff" });
-                        layer.closePopup();
-                    });
+        document.getElementById('status-message').innerText = 'Postcode data loaded successfully!';
+        
+        if (data.data && data.data.length > 0) {
+            data.data.forEach(postcode => {
+                if (postcode.latitude && postcode.longitude) {
+                    L.marker([postcode.latitude, postcode.longitude])
+                        .addTo(map)
+                        .bindPopup(`<b>${postcode.postcode}</b><br>${postcode.admin_district}`);
                 }
-            }).addTo(map);
-        });
+            });
+        } else {
+            document.getElementById('status-message').innerText = 'No postcode data available.';
+        }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error fetching postcode data:', error);
+        document.getElementById('status-message').innerText = 'Failed to load postcode data.';
+    });
