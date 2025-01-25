@@ -34,8 +34,23 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions@github.com"
-          git pull origin main --rebase
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/Deepak-Sekar-p/hello-grad.git
+          
+          # Stash any unstaged changes to avoid conflicts
+          git add .
+          git commit -m "Stashing unstaged changes before pull" || echo "No changes to stash"
+          git stash
 
+          # Pull the latest changes prioritizing remote changes to avoid conflicts
+          git pull origin main --rebase --strategy-option=theirs
+
+          # Apply stashed changes back
+          git stash pop || echo "No stashed changes to apply"
+
+          # Ensure the data directory exists
+          mkdir -p data
+
+          # Check if data file exists before committing
           if [ -f "data/uk_postcodes.json" ]; then
             git add data/uk_postcodes.json
             git commit -m "Auto-update postcode data" || echo "No changes to commit"
