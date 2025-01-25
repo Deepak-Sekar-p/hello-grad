@@ -5,7 +5,7 @@ from github import Github
 
 # Constants
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # GitHub token for authentication
-REPO_NAME = "yourusername/hello-grad-webapp"
+REPO_NAME = "Deepak-Sekar-p/hello-grad"
 DATA_FILE_PATH = "uk_postcodes.json"
 
 # Function to fetch postcode data from an open API (e.g., Ordnance Survey, OpenData)

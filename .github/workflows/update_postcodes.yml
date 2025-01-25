@@ -1,0 +1,35 @@
+name: Update UK Postcodes
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"  # Runs every Sunday at midnight UTC
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests PyGithub
+
+      - name: Run postcode update script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python backend/update_data.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions@github.com"
+          git add data/uk_postcodes.json
+          git commit -m "Auto-update postcode data"
+          git push
